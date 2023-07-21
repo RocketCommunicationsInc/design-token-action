@@ -1,0 +1,19 @@
+name: 'Design Token Bot'
+description: 'Automatically comments PRs with a human-readable list of token changes'
+inputs:
+  repo-token:
+    description: "Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}"
+    required: true
+  default-branch:
+    description: "The name of your default branch to compare against"
+    required: false
+    default: "main"
+  files:
+    description: "Comma-separated list of token globs to check"
+    default: 'tokens/*.json'
+outputs:
+  changes: # output will be available to future steps
+    description: 'Formatted list of changes'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
