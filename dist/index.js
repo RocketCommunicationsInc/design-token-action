@@ -97,6 +97,7 @@ const core = __nccwpck_require__(2186);
 const fs = __nccwpck_require__(7147);
 const github = __nccwpck_require__(5438);
 const { exec } = __nccwpck_require__(2081);
+const { promisify } = __nccwpck_require__(3837);
 const { parseCompare } = __nccwpck_require__(358);
 const glob = __nccwpck_require__(1957);
 function readBranchFile(filePath) {
@@ -121,28 +122,27 @@ function readBranchFile(filePath) {
 }
 function readDefaultFile(tokenPath, defaultBranch) {
     return __awaiter(this, void 0, void 0, function* () {
-        const command = `git show origin/${defaultBranch}:${tokenPath}`;
-        return new Promise((resolve, reject) => {
-            exec(command, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Unable to find token path: ${tokenPath} `);
-                    return resolve({});
-                }
-                if (stderr) {
-                    console.error(`Command stderr: ${stderr}`);
-                    return resolve({});
-                }
-                try {
-                    const jsonObject = JSON.parse(stdout.toString());
-                    resolve(jsonObject);
-                }
-                catch (parseError) {
-                    console.error(`Error reading ${tokenPath}`);
-                    reject(parseError);
-                }
-            });
-        });
+        // Sanitize user inputs to avoid command injection
+        const sanitizedTokenPath = tokenPath.replace(/[^a-zA-Z0-9_-]/g, ''); // Remove any characters not allowed in the token path
+        const sanitizedDefaultBranch = defaultBranch.replace(/[^a-zA-Z0-9_-]/g, ''); // Remove any characters not allowed in the default branch name
+        const command = `git show origin/${sanitizedDefaultBranch}:${sanitizedTokenPath}`;
+        // Use promisify to convert exec to a promise-based function
+        const execPromise = promisify(exec);
+        try {
+            const { stdout } = yield execPromise(command);
+            // Since we're parsing JSON, also sanitize the JSON data to prevent potential JSON injections
+            const safeJsonObject = JSON.parse(sanitizeJson(stdout));
+            return safeJsonObject;
+        }
+        catch (error) {
+            console.error(`Error reading ${tokenPath}:`);
+            return {};
+        }
     });
+}
+function sanitizeJson(jsonString) {
+    // Replace any unsafe characters in the JSON string
+    return jsonString.replace(/[^a-zA-Z0-9{}[\]:,".\-_ ]/g, '');
 }
 function createChangeRow(change) {
     return `

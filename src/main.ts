@@ -2,6 +2,7 @@ const core = require('@actions/core')
 const fs = require('fs')
 const github = require('@actions/github')
 const {exec} = require('child_process')
+const { promisify } = require('util');
 const {parseCompare} = require('./functions')
 const glob = require('glob')
 
@@ -31,31 +32,34 @@ async function readBranchFile(filePath: string) {
   })
 }
 
+
 async function readDefaultFile(tokenPath: string, defaultBranch: string) {
-  const command = `git show origin/${defaultBranch}:${tokenPath}`
+  // Sanitize user inputs to avoid command injection
+  const sanitizedTokenPath = tokenPath.replace(/[^a-zA-Z0-9_-]/g, ''); // Remove any characters not allowed in the token path
+  const sanitizedDefaultBranch = defaultBranch.replace(/[^a-zA-Z0-9_-]/g, ''); // Remove any characters not allowed in the default branch name
 
-  return new Promise((resolve, reject) => {
-    exec(command, (error: Error, stdout: Buffer, stderr: Buffer) => {
-      if (error) {
-        console.error(`Unable to find token path: ${tokenPath} `)
-        return resolve({})
-      }
+  const command = `git show origin/${sanitizedDefaultBranch}:${sanitizedTokenPath}`;
 
-      if (stderr) {
-        console.error(`Command stderr: ${stderr}`)
-        return resolve({})
-      }
+  // Use promisify to convert exec to a promise-based function
+  const execPromise = promisify(exec);
 
-      try {
-        const jsonObject = JSON.parse(stdout.toString())
-        resolve(jsonObject)
-      } catch (parseError) {
-        console.error(`Error reading ${tokenPath}`)
-        reject(parseError)
-      }
-    })
-  })
+  try {
+    const { stdout } = await execPromise(command);
+
+    // Since we're parsing JSON, also sanitize the JSON data to prevent potential JSON injections
+    const safeJsonObject = JSON.parse(sanitizeJson(stdout));
+    return safeJsonObject;
+  } catch (error) {
+    console.error(`Error reading ${tokenPath}:`);
+    return {};
+  }
 }
+
+function sanitizeJson(jsonString: string) {
+  // Replace any unsafe characters in the JSON string
+  return jsonString.replace(/[^a-zA-Z0-9{}[\]:,".\-_ ]/g, '');
+}
+
 
 function createChangeRow(change: TokenChange) {
   return `
