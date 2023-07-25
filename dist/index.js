@@ -17,8 +17,11 @@ function filterByLastItemIsValue(paths) {
 }
 function getName(item) {
     var _a, _b;
-    if (item.kind === 'E') {
-        return (_a = item === null || item === void 0 ? void 0 : item.path) === null || _a === void 0 ? void 0 : _a.slice(0, -1).join('-');
+    if (item.path) {
+        const lastItem = item.path[item.path.length - 1];
+        if (lastItem === 'value' || lastItem === '$value') {
+            return (_a = item === null || item === void 0 ? void 0 : item.path) === null || _a === void 0 ? void 0 : _a.slice(0, -1).join('-');
+        }
     }
     return (_b = item.path) === null || _b === void 0 ? void 0 : _b.join('-');
 }
