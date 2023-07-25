@@ -20,6 +20,7 @@ For now, you'll need to run this against your post transformed tokens, preferabl
 
 Workflow:
 
+* Make sure to use checkout with fetch-depth: 0, its important
 
 ```yml
 name: Design Token Changes
