@@ -20,12 +20,8 @@ interface TokenNode {
 }
 
 function getName(item: Diff<TokenNode>) {
-  if (item.path) {
-    const lastItem = item.path[item.path.length - 1]
-
-    if (lastItem === 'value' || lastItem === '$value') {
-      return item?.path?.slice(0, -1).join('-')
-    }
+  if (item.kind === 'E') {
+    return item?.path?.slice(0, -1).join('-')
   }
   return item.path?.join('-')
 }
@@ -52,7 +48,6 @@ function parseCompare(mainTokens: TokenSet, branchTokens: TokenSet) {
           N: 'added',
           D: 'deleted'
         }
-
 
         if (item.kind === 'E') {
           const itemsOnly = filterByLastItemIsValue(item.path)
