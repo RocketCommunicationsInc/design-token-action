@@ -4,7 +4,7 @@
   "description": "Adds a human readable list of your design token changes on PRs",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc && npm run format",
+    "build": "tsc && npm run package",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
