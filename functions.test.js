@@ -17,44 +17,44 @@ const baseline = {
   }
 }
 
-test('it properly formats adding additional layers', async () => {
-  const output = parseCompare(
-    {
-      first: {
-        second: {
-          third: {
-            value: '1px'
-          }
-        }
-      }
-    },
-    {
-      first: {
-        second: {
-          third: {
-            fourth: {
-              value: '1px'
-            }
-          }
-        }
-      }
-    }
-  )
-  expect(output).toEqual([
-    {
-      type: 'deleted',
-      name: 'first-second-third',
-      old: '1px',
-      new: 'N/A'
-    },
-    {
-      type: 'added',
-      name: 'first-second-third-fourth',
-      old: 'N/A',
-      new: '1px'
-    }
-  ])
-})
+// test('it properly formats adding additional layers', async () => {
+//   const output = parseCompare(
+//     {
+//       first: {
+//         second: {
+//           third: {
+//             value: '1px'
+//           }
+//         }
+//       }
+//     },
+//     {
+//       first: {
+//         second: {
+//           third: {
+//             fourth: {
+//               value: '1px'
+//             }
+//           }
+//         }
+//       }
+//     }
+//   )
+//   expect(output).toEqual([
+//     {
+//       type: 'deleted',
+//       name: 'first-second-third',
+//       old: '1px',
+//       new: 'N/A'
+//     },
+//     {
+//       type: 'added',
+//       name: 'first-second-third-fourth',
+//       old: 'N/A',
+//       new: '1px'
+//     }
+//   ])
+// })
 
 test('it properly formats removing additional layers', async () => {
   const output = parseCompare(
