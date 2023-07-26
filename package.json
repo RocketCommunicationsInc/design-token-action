@@ -2,7 +2,7 @@
   "name": "@astrouxds/design-token-action",
   "version": "0.0.1",
   "description": "Adds a human readable list of your design token changes on PRs",
-  "main": "dist/index.js",
+  "main": "lib/main.js",
   "scripts": {
     "build": "tsc && npm run package",
     "format": "prettier --write '**/*.ts'",
